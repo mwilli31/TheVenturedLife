@@ -12,3 +12,10 @@ h3 {
     -webkit-backface-visibility: visible;
     backface-visibility: visible;
 }
+
+#webviewbuttons {
+	font-family: "Trebuchet MS";
+	color: white; 
+	padding: 15px;
+	font-size: 125%;
+}
