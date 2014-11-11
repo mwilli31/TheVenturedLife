@@ -8,7 +8,7 @@ define(function(require, exports, module) {
     var Easing          = require('famous/transitions/Easing');
     var ImageSurface    = require('famous/surfaces/ImageSurface');
     var ContainerSurface= require('famous/surfaces/ContainerSurface');
- //   var EpisodesView    = require('views/EpisodesView');
+    var EpisodesView    = require('views/EpisodesView');
 
 
 
@@ -18,8 +18,8 @@ define(function(require, exports, module) {
         _createBackground.call(this);
         _createButtons.call(this);
         _createTitle.call(this);
-        _createHeaderButtons.call(this);
-     //   _createEpisodesView.call(this);
+        //_createHeaderButtons.call(this);
+        _createEpisodesView.call(this);
 
         _setListeners.call(this);
 
@@ -53,6 +53,7 @@ define(function(require, exports, module) {
 
         this.add(showEpisodesButtonModifier).add(this.showEpisodesButton);
     }
+
     //begin Jonathan edits
     function _createTitle() {
         this.titleSurface = new Surface({
@@ -108,16 +109,13 @@ define(function(require, exports, module) {
 
     function _createEpisodesView() {
        this.episodesView = new EpisodesView();
-      /* var toBackground = new StateModifier({
-            transform: Transform.translate(0,0,-10)
-        });
-        this.add(toBackground).add(this.episodesView2); */
+        this.add(this.episodesView);
     } 
 
     function _setListeners() {
-        //emitters
         this.showEpisodesButton.on('click', function() {
-            this._eventOutput.emit('menuToggle');
+            console.log("hi");
+            this.episodesView.show();
         }.bind(this));
     }
 

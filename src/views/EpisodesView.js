@@ -5,15 +5,20 @@ define(function(require, exports, module) {
     var Surface         = require('famous/core/Surface');
     var Transform       = require('famous/core/Transform');
     var StateModifier   = require('famous/modifiers/StateModifier');
+    var Modifier        = require("famous/core/Modifier");
     var Easing          = require('famous/transitions/Easing');
     var ImageSurface    = require('famous/surfaces/ImageSurface');
+    var GridLayout      = require("famous/views/GridLayout");
+
 
 
     function EpisodesView() {
         View.apply(this, arguments);
 
+        this.windowWidth = window.innerWidth;
+        this.windowHeight = window.innerHeight;
+
         _createBackground.call(this);
-        _createButtons.call(this);
 
         _setListeners.call(this);
     }
@@ -21,46 +26,60 @@ define(function(require, exports, module) {
     EpisodesView.prototype = Object.create(View.prototype);
     EpisodesView.prototype.constructor = EpisodesView;
 
-    EpisodesView.DEFAULT_OPTIONS = {
-    };
+    EpisodesView.DEFAULT_OPTIONS = {};
 
     function _createBackground() {
-        this.backgroundSurface = new Surface({
-            size: [1, undefined],
-            properties: {
-                backgroundColor: "rgba(12,12,12, 0.5)"
-            }
+        this.popupGrid = new GridLayout({
+            dimensions: [4, 2]
         });
 
-        var backgroundModifier = new StateModifier({
-            origin: [.5, 0.5],
-            align : [.5, 0.5]
+
+        this.containerWidth = this.windowWidth - (this.windowWidth/3);
+        this.containerHeight = this.windowHeight - (this.windowHeight/4);
+
+        var marginPx = 10;
+
+        var width = this.containerWidth/4 - 10;
+        var height = this.containerHeight/2 - 10;
+
+        this.popupGridModifier = new StateModifier ({
+            transform: Transform.translate(0, 0, -1)
         });
 
-        this.add(this.backgroundSurface);
-    }
+        var surfaces = [];
+        this.popupGrid.sequenceFrom(surfaces);
 
-    function _createButtons() {
-        this.showEpisodesButton = new ImageSurface({
-            size: [160,45],
-            content: 'img/ViewEpisodesButton.png'
-        });
+        for(var i = 0; i < 8; i++) {
+            surfaces.push(new Surface({
+                content: "I am panel " + (i + 1),
+                size: [width,height],
+                properties: {
+                    backgroundColor: "white",
+                    color: "black",
+                    textAlign: 'center',
+                    margin: '5px'
+                }
+            }));
+        }
 
-        var showEpisodesButtonModifier = new StateModifier({
-            origin: [.5, 0.8],
-            align : [.5, 0.8]
-        });
-
-        this.add(showEpisodesButtonModifier).add(this.showEpisodesButton);
+        this.add(new Modifier({
+            size: [this.containerWidth, this.containerHeight],
+            origin: [.5, .5],
+            align: [.5, .5]
+        })).add(this.popupGridModifier).add(this.popupGrid);
     }
 
     function _setListeners() {
-        //emitters
-        this.showEpisodesButton.on('click', function() {
-            this._eventOutput.emit('menuToggle');
-        }.bind(this));
+
     }
 
-    module.exports = WebsiteView;
+    EpisodesView.prototype.show = function () {
+        this.popupGridModifier.setTransform(Transform.translate(0, 0, 5), {
+            duration: 1000,
+            curve: Easing.outBack
+        });
+    };
+
+    module.exports = EpisodesView;
 });
 
