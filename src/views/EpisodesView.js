@@ -28,6 +28,14 @@ define(function(require, exports, module) {
     EpisodesView.DEFAULT_OPTIONS = {};
 
     function _createBackground() {
+
+        this.backgroundSurface = new Surface ({
+            size: [undefined,undefined],
+            properties: {
+                backgroundColor: "rgba(112,112,112, 0.8)"
+            }
+        });
+
         this.popupGrid = new GridLayout({
             dimensions: [4, 2]
         });
@@ -59,7 +67,7 @@ define(function(require, exports, module) {
             }));
         }
 
-        var modifier = new Modifier({
+        var popupModifier = new Modifier({
             size: [this.containerWidth, this.containerHeight],
             origin: [0.5, 0.5],
             align: [0.5, 0.5],
@@ -71,7 +79,20 @@ define(function(require, exports, module) {
             }.bind(this)
         });
 
-        this.add(modifier).add(this.popupGrid);
+        var backgroungModifier = new Modifier({
+            size: [this.containerWidth, this.containerHeight],
+            origin: [0.5, 0.5],
+            align: [0.5, 0.5],
+            transform: function() {
+                // cache the value of transitionable.get()
+                // to optimize for performance
+                var scale = this.gridTransitionable.get();
+                return Transform.scale(scale, scale, 1);
+            }.bind(this)
+        });
+
+        this.add(backgroungModifier).add(this.backgroundSurface);
+        this.add(popupModifier).add(this.popupGrid);
     }
 
     function _setListeners() {

@@ -5,17 +5,22 @@ define(function(require, exports, module) {
     var Surface         = require('famous/core/Surface');
     var Transform       = require('famous/core/Transform');
     var StateModifier   = require('famous/modifiers/StateModifier');
-    var Easing          = require('famous/transitions/Easing');
     var ImageSurface    = require('famous/surfaces/ImageSurface');
     var ContainerSurface= require('famous/surfaces/ContainerSurface');
-    var EpisodesView    = require('views/EpisodesView');
+    var Modifier        = require("famous/core/Modifier");
+    var Easing          = require('famous/transitions/Easing');
+    var Transitionable  = require('famous/transitions/Transitionable');
+    var Timer           = require('famous/utilities/Timer');
 
+
+    var EpisodesView    = require('views/EpisodesView');
 
 
     function WebsiteView() {
         View.apply(this, arguments);
 
         this.episodesViewShowing = false;
+        this.episodesButtonHighlighted = false;
 
         _createBackground.call(this);
         _createButtons.call(this);
@@ -36,24 +41,50 @@ define(function(require, exports, module) {
     function _createBackground() {
         this.backgroundSurface = new ImageSurface({
             size: [undefined, undefined],
-            content: 'img/Cover.jpg'
+            content: 'img/Cover.png'
         });
 
         this.add(this.backgroundSurface);
     }
 
     function _createButtons() {
+        this.showEpisodesButtonContainer = new ContainerSurface({
+            size: [160,45]
+        });
+
         this.showEpisodesButton = new ImageSurface({
-            size: [160,45],
+            size: [undefined,undefined],
             content: 'img/ViewEpisodesButton.png'
+        });
+
+        this.showEpisodesButtonHighlighted = new ImageSurface({
+            size: [undefined,undefined],
+            content: 'img/ViewEpisodesButtonPressed.png'
         });
 
         var showEpisodesButtonModifier = new StateModifier({
             origin: [.5, 0.8],
             align : [.5, 0.8]
-        }); 
+        });
 
-        this.add(showEpisodesButtonModifier).add(this.showEpisodesButton);
+        this.showEpisodesButtonTransistionable = new Transitionable(0);
+
+        var modifier = new Modifier({
+            origin: [0.5, 0.8],
+            align: [0.5, 0.8],
+            transform: function() {
+                // cache the value of transitionable.get()
+                // to optimize for performance
+                var scale = this.showEpisodesButtonTransistionable.get();
+                return Transform.scale(scale, scale, 1);
+            }.bind(this)
+        });
+
+        this.showEpisodesButtonContainer.add(this.showEpisodesButton);
+        this.showEpisodesButtonContainer.add(modifier).add(this.showEpisodesButtonHighlighted);
+
+        this.add(showEpisodesButtonModifier).add(this.showEpisodesButtonContainer);
+
     }
 
     //begin Jonathan edits
@@ -115,13 +146,38 @@ define(function(require, exports, module) {
     } 
 
     function _setListeners() {
-        this.showEpisodesButton.on('click', function() {
+        this.showEpisodesButtonContainer.on('mouseover', function() {
+            if(!this.episodesButtonHighlighted) {
+                this.showEpisodesButtonTransistionable.set(1, {
+                    duration: 100,
+                    curve: Easing.inOutQuart
+                }, function() {
+                    this.episodesButtonHighlighted = true;
+                }.bind(this));
+            }
+        }.bind(this));
+
+        this.showEpisodesButtonContainer.on('mouseout', function() {
+            if(this.episodesButtonHighlighted && !this.episodesViewShowing) {
+                this.showEpisodesButtonTransistionable.set(0, {
+                    duration: 100,
+                    curve: Easing.inOutQuart
+                }, function () {
+                    this.episodesButtonHighlighted = false;
+                }.bind(this));
+            }
+
+        }.bind(this));
+
+        this.showEpisodesButtonContainer.on('click', function() {
             if(!this.episodesViewShowing) {
+                this.showEpisodesButtonTransistionable.set(1);
                 this.episodesView.show();
                 this.episodesViewShowing = true;
             } else {
                 this.episodesView.hide();
                 this.episodesViewShowing = false;
+
             }
         }.bind(this));
 
@@ -129,6 +185,13 @@ define(function(require, exports, module) {
             if(this.episodesViewShowing) {
                 this.episodesView.hide();
                 this.episodesViewShowing = false;
+
+                this.showEpisodesButtonTransistionable.set(0, {
+                    duration: 200,
+                    curve: Easing.inOutQuart
+                }, function () {
+                    this.episodesButtonHighlighted = false;
+                }.bind(this));
             }
         }.bind(this));
     }
