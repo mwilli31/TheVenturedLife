@@ -9,8 +9,7 @@ define(function(require, exports, module) {
     var Easing          = require('famous/transitions/Easing');
     var ImageSurface    = require('famous/surfaces/ImageSurface');
     var GridLayout      = require("famous/views/GridLayout");
-
-
+    var Transitionable  = require('famous/transitions/Transitionable');
 
     function EpisodesView() {
         View.apply(this, arguments);
@@ -33,18 +32,16 @@ define(function(require, exports, module) {
             dimensions: [4, 2]
         });
 
+        this.gridTransitionable = new Transitionable(0);
 
-        this.containerWidth = this.windowWidth - (this.windowWidth/3);
+        this.containerWidth = this.windowWidth - (this.windowWidth/4);
         this.containerHeight = this.windowHeight - (this.windowHeight/4);
 
-        var marginPx = 10;
+        var marginPx = 40;
 
-        var width = this.containerWidth/4 - 10;
-        var height = this.containerHeight/2 - 10;
+        var width = this.containerWidth/4 - marginPx;
+        var height = this.containerHeight/2 - marginPx;
 
-        this.popupGridModifier = new StateModifier ({
-            transform: Transform.translate(0, 0, -1)
-        });
 
         var surfaces = [];
         this.popupGrid.sequenceFrom(surfaces);
@@ -57,16 +54,24 @@ define(function(require, exports, module) {
                     backgroundColor: "white",
                     color: "black",
                     textAlign: 'center',
-                    margin: '5px'
+                    margin: '20px'
                 }
             }));
         }
 
-        this.add(new Modifier({
+        var modifier = new Modifier({
             size: [this.containerWidth, this.containerHeight],
-            origin: [.5, .5],
-            align: [.5, .5]
-        })).add(this.popupGridModifier).add(this.popupGrid);
+            origin: [0.5, 0.5],
+            align: [0.5, 0.5],
+            transform: function() {
+                // cache the value of transitionable.get()
+                // to optimize for performance
+                var scale = this.gridTransitionable.get();
+                return Transform.scale(scale, scale, 1);
+            }.bind(this)
+        });
+
+        this.add(modifier).add(this.popupGrid);
     }
 
     function _setListeners() {
@@ -74,9 +79,16 @@ define(function(require, exports, module) {
     }
 
     EpisodesView.prototype.show = function () {
-        this.popupGridModifier.setTransform(Transform.translate(0, 0, 5), {
-            duration: 1000,
+        this.gridTransitionable.set(1, {
+            duration: 500,
             curve: Easing.outBack
+        });
+    };
+
+    EpisodesView.prototype.hide = function () {
+        this.gridTransitionable.set(0, {
+            duration: 100,
+            curve: Easing.out
         });
     };
 

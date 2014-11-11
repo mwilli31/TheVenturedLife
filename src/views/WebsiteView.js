@@ -15,6 +15,8 @@ define(function(require, exports, module) {
     function WebsiteView() {
         View.apply(this, arguments);
 
+        this.episodesViewShowing = false;
+
         _createBackground.call(this);
         _createButtons.call(this);
         _createTitle.call(this);
@@ -114,8 +116,20 @@ define(function(require, exports, module) {
 
     function _setListeners() {
         this.showEpisodesButton.on('click', function() {
-            console.log("hi");
-            this.episodesView.show();
+            if(!this.episodesViewShowing) {
+                this.episodesView.show();
+                this.episodesViewShowing = true;
+            } else {
+                this.episodesView.hide();
+                this.episodesViewShowing = false;
+            }
+        }.bind(this));
+
+        this.backgroundSurface.on('click', function() {
+            if(this.episodesViewShowing) {
+                this.episodesView.hide();
+                this.episodesViewShowing = false;
+            }
         }.bind(this));
     }
 
