@@ -14,6 +14,7 @@ define(function(require, exports, module) {
 
 
     var EpisodesView    = require('views/EpisodesView');
+    var ProfilesView    = require('views/ProfilesView');
 
 
     function WebsiteView() {
@@ -27,6 +28,7 @@ define(function(require, exports, module) {
         _createTitle.call(this);
         //_createHeaderButtons.call(this);
         _createEpisodesView.call(this);
+        _createProfilesView.call(this);
 
         _setListeners.call(this);
 
@@ -64,7 +66,7 @@ define(function(require, exports, module) {
 
         var showEpisodesButtonModifier = new StateModifier({
             origin: [.5, 0.8],
-            align : [.5, 0.8]
+            align : [.4, 0.8]
         });
 
         this.showEpisodesButtonTransistionable = new Transitionable(0);
@@ -82,8 +84,43 @@ define(function(require, exports, module) {
 
         this.showEpisodesButtonContainer.add(this.showEpisodesButton);
         this.showEpisodesButtonContainer.add(modifier).add(this.showEpisodesButtonHighlighted);
-
+;
         this.add(showEpisodesButtonModifier).add(this.showEpisodesButtonContainer);
+        ///////////////////////////
+        this.showProfilesButtonConatiner = new ContainerSurface({
+            size: [160, 45]
+        });
+
+        this.showProfilesButton = new ImageSurface({
+            size: [undefined, undefined],
+            content: 'img/ViewEpisodesButton.png'
+        });
+
+        this.showProfilesButtonHighlighted = new ImageSurface({
+            size: [undefined, undefined],
+            content: 'img/ViewEpisodesButtonPressed.png'
+        });
+
+        var showProfilesButtonModifier = new StateModifier({
+            origin: [0.5, 0.8],
+            align: [0.6, 0.8]
+        });
+
+        this.showProfilesButtonTransitionable = new Transitionable(0);
+
+        var modifier2 = new Modifier({
+            origin: [0.5, 0.8],
+            align: [0.5, 0.8],
+            transform: function() {
+                var scale = this.showProfilesButtonTransitionable.get();
+                return Transform.scale(scale, scale, 1);
+            }.bind(this)
+        });
+
+        this.showProfilesButtonConatiner.add(this.showProfilesButton);
+        this.showProfilesButtonConatiner.add(modifier2).add(this.showProfilesButtonHighlighted);
+
+        this.add(showProfilesButtonModifier).add(this.showProfilesButtonConatiner);
 
     }
 
@@ -144,6 +181,11 @@ define(function(require, exports, module) {
        this.episodesView = new EpisodesView();
         this.add(this.episodesView);
     } 
+    //creates ProfilesView
+    function _createProfilesView() {
+        this.profilesView = new ProfilesView();
+        this.add(this.profilesView);
+    }
 
     function _setListeners() {
         this.showEpisodesButtonContainer.on('mouseover', function() {
@@ -193,7 +235,52 @@ define(function(require, exports, module) {
                     this.episodesButtonHighlighted = false;
                 }.bind(this));
             }
+            if(this.profilesViewShowing) {
+                this.profilesView.hide();
+                this.profilesViewShowing = false;
+
+                this.showProfilesButtonTransitionable.set(0, {
+                    duration: 200,
+                    curve: Easing.inOutQuart
+                }, function () {
+                    this.profilesButtonHighlighted = false;
+                }.bind(this));
+            }
         }.bind(this));
+
+        this.showProfilesButtonConatiner.on('mouseover', function() {
+            if(!this.profilesButtonHighlighted) {
+                this.showProfilesButtonTransitionable.set(1, {
+                    duration: 100,
+                    curve: Easing.inOutQuart
+                }, function() {
+                    this.profilesButtonHighlighted = true;
+                }.bind(this));
+            }
+        }.bind(this));
+        this.showProfilesButtonConatiner.on('mouseout', function() {
+            if(this.profilesButtonHighlighted && !this.profilesViewShowing) {
+                this.showProfilesButtonTransitionable.set(0, {
+                    duration: 100,
+                    curve: Easing.inOutQuart
+                }, function () {
+                    this.profilesButtonHighlighted = false;
+                }.bind(this));
+            }
+
+        }.bind(this));
+         this.showProfilesButtonConatiner.on('click', function() {
+            if(!this.profilesViewShowing) {
+                this.showProfilesButtonTransitionable.set(1);
+                this.profilesView.show();
+                this.profilesViewShowing = true;
+            } else {
+                this.profilesView.hide();
+                this.profilesViewShowing = false;
+
+            }
+        }.bind(this));
+
     }
 
     module.exports = WebsiteView;
