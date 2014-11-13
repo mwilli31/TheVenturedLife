@@ -15,6 +15,7 @@ define(function(require, exports, module) {
 
     var EpisodesView    = require('views/EpisodesView');
     var ProfilesView    = require('views/ProfilesView');
+    var ProfileView     = require('views/ProfileView');
 
 
     function WebsiteView() {
@@ -26,11 +27,11 @@ define(function(require, exports, module) {
         _createBackground.call(this);
         _createButtons.call(this);
         _createTitle.call(this);
-        //_createHeaderButtons.call(this);
         _createEpisodesView.call(this);
         _createProfilesView.call(this);
-
         _setListeners.call(this);
+
+         //_createHeaderButtons.call(this);
 
     }
 
@@ -84,7 +85,7 @@ define(function(require, exports, module) {
 
         this.showEpisodesButtonContainer.add(this.showEpisodesButton);
         this.showEpisodesButtonContainer.add(modifier).add(this.showEpisodesButtonHighlighted);
-;
+
         this.add(showEpisodesButtonModifier).add(this.showEpisodesButtonContainer);
         ///////////////////////////
         this.showProfilesButtonConatiner = new ContainerSurface({
@@ -137,7 +138,7 @@ define(function(require, exports, module) {
             }
         });
         var titleSurfaceModifier = new StateModifier({
-            transform: Transform.translate(0, 0, 1)
+            transform: Transform.translate(0, 0, 0.1)
         });
 
         this.add(titleSurfaceModifier).add(this.titleSurface);
@@ -208,7 +209,6 @@ define(function(require, exports, module) {
                     this.episodesButtonHighlighted = false;
                 }.bind(this));
             }
-
         }.bind(this));
 
         this.showEpisodesButtonContainer.on('click', function() {

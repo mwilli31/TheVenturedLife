@@ -13,6 +13,8 @@ define(function(require, exports, module) {
     var ContainerSurface= require('famous/surfaces/ContainerSurface');
     var Timer           = require('famous/utilities/Timer');
 
+    var ProfileView     = require('views/ProfileView');
+
     function ProfilesView() {
         View.apply(this, arguments);
 
@@ -36,6 +38,11 @@ define(function(require, exports, module) {
         _createBackground.call(this);
         _setListeners.call(this);
         _setHoverListeners.call(this);
+        _createProfileView.call(this);
+    }
+    function _createProfileView() {
+        this.profileView = new ProfileView();
+        this.add(this.profileView);
     }
     //Mike this is driving me crazy. If I do it with just a loop it will throw an error saying it can't access it
     //so this is my terrible solution so I can stop looking at it, aka put it in a collapsable function
@@ -327,7 +334,20 @@ define(function(require, exports, module) {
         }.bind(this));
     }
     function _setListeners() {
-        
+        this.containerSurfaces[0].on('click', function() {
+            this.profileView.show(); 
+        }.bind(this));
+        /*this.showEpisodesButtonContainer.on('click', function() {
+            if(!this.episodesViewShowing) {
+                this.showEpisodesButtonTransistionable.set(1);
+                this.episodesView.show();
+                this.episodesViewShowing = true;
+            } else {
+                this.episodesView.hide();
+                this.episodesViewShowing = false;
+
+            }
+        }.bind(this));*/ 
     }
 
     ProfilesView.prototype.show = function () {
