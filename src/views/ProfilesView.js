@@ -14,6 +14,7 @@ define(function(require, exports, module) {
     var Timer           = require('famous/utilities/Timer');
 
     var ProfileView     = require('views/ProfileView');
+    var ProfileCardView = require('views/ProfileCardView');
 
     function ProfilesView() {
         View.apply(this, arguments);
@@ -21,89 +22,20 @@ define(function(require, exports, module) {
         this.windowWidth = window.innerWidth;
         this.windowHeight = window.innerHeight;
 
-        this.containerSurfaces = [];
-        this.imageSurfaces = [];
-        this.overlaySurfaces = [];
-        this.modifiersForOverlay = [];
-        this.overlayTransitionables = [];
-        this.overlayModifiers = [];
-        this.overlaySurfaceShowing = [];
-        for(var i = 0; i < 9; i++) {
-            this.overlayTransitionables.push(new Transitionable(0));
+        this.profileCardArray = [];
+        this.profileArray = [];
 
-            this.overlaySurfaceShowing.push(false);
-        }
-
-        _setModifiers.call(this); 
         _createBackground.call(this);
         _setListeners.call(this);
-        _setHoverListeners.call(this);
         _createProfileView.call(this);
     }
     function _createProfileView() {
-        this.profileView = new ProfileView();
-        this.add(this.profileView);
+        for(var i = 0; i < 8; i++) {
+            this.profileArray.push(new ProfilesView(i));
+            this.add(this.profileView[i]); 
+        }
     }
-    //Mike this is driving me crazy. If I do it with just a loop it will throw an error saying it can't access it
-    //so this is my terrible solution so I can stop looking at it, aka put it in a collapsable function
-    function _setModifiers() {
-        this.overlayModifiers.push(new Modifier({
-            transform: Transform.translate(0, 0, 0),
-            transform: function() {
-                var scale = this.overlayTransitionables[0].get();
-                return Transform.scale(scale, scale, 1);
-            }.bind(this)
-        }));
-        this.overlayModifiers.push(new Modifier({
-            transform: Transform.translate(0, 0, 0),
-            transform: function() {
-                var scale = this.overlayTransitionables[1].get();
-                return Transform.scale(scale, scale, 1);
-            }.bind(this)
-        }));
-        this.overlayModifiers.push(new Modifier({
-            transform: Transform.translate(0, 0, 0),
-            transform: function() {
-                var scale = this.overlayTransitionables[2].get();
-                return Transform.scale(scale, scale, 1);
-            }.bind(this)
-        }));
-        this.overlayModifiers.push(new Modifier({
-            transform: Transform.translate(0, 0, 0),
-            transform: function() {
-                var scale = this.overlayTransitionables[3].get();
-                return Transform.scale(scale, scale, 1);
-            }.bind(this)
-        }));
-        this.overlayModifiers.push(new Modifier({
-            transform: Transform.translate(0, 0, 0),
-            transform: function() {
-                var scale = this.overlayTransitionables[4].get();
-                return Transform.scale(scale, scale, 1);
-            }.bind(this)
-        }));
-        this.overlayModifiers.push(new Modifier({
-            transform: Transform.translate(0, 0, 0),
-            transform: function() {
-                var scale = this.overlayTransitionables[5].get();
-                return Transform.scale(scale, scale, 1);
-            }.bind(this)
-        }));
-        this.overlayModifiers.push(new Modifier({
-            transform: Transform.translate(0, 0, 0),
-            transform: function() {
-                var scale = this.overlayTransitionables[6].get();
-                return Transform.scale(scale, scale, 1);
-            }.bind(this)
-        }));
-        this.overlayModifiers.push(new Modifier({
-            transform: Transform.translate(0, 0, 0),
-            transform: function() {
-                var scale = this.overlayTransitionables[7].get();
-                return Transform.scale(scale, scale, 1);
-            }.bind(this)
-        }));
-    }
+
     ProfilesView.prototype = Object.create(View.prototype);
     ProfilesView.prototype.constructor = ProfilesView;
 
@@ -133,37 +65,10 @@ define(function(require, exports, module) {
         var height = this.containerHeight/2 - marginPx;
 
 
-        this.popupGrid.sequenceFrom(this.containerSurfaces);
+        this.popupGrid.sequenceFrom(this.profileCardArray);
 
         for(var i = 0; i < 8; i++) {
-            var tempContainerSurface = new ContainerSurface();
-
-            this.imageSurfaces.push(new ImageSurface({
-                content: 'img/tempPhoto.jpg', 
-                size: [width,height], 
-                properties: {
-                    margin: '20px'
-                }
-            }));
-
-            this.overlaySurfaces.push(new Surface({
-                content: " I am the overlay for " + (i +1),
-                size: [width, height - height/4],
-                properties: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                    color: 'white',
-                    textAlign: 'center',
-                    margin: '20px'
-                }
-            }));
-
-            this.tempModifier = new StateModifier({
-                transform: Transform.translate(0, height/4, 0),
-            });
-            tempContainerSurface.add(this.imageSurfaces[i]);
-            tempContainerSurface.add(this.overlayModifiers[i]).add(this.tempModifier).add(this.overlaySurfaces[i]);
-            
-            this.containerSurfaces.push(tempContainerSurface);
+            this.profileCardArray.push(new ProfileCardView('img/tempPhoto.jpg', 'I am a surface', width, height, this.marginPx));
         }
 
         var popupModifier = new Modifier({
@@ -193,161 +98,12 @@ define(function(require, exports, module) {
         this.add(backgroungModifier).add(this.backgroundSurface);
         this.add(popupModifier).add(this.popupGrid);
     }
-    //again this is frustrating the hell out of me. Spent more than 2 hours trying to debug this and just wanted something
-    //functional so I just stuck this ridiculously long piece of code in here. If you can get the loop to work, great, I don't
-    //even care at this point
-    function _setHoverListeners() {
-        this.containerSurfaces[0].on('mouseenter', function() {
-            if(!this.overlaySurfaceShowing[0]) {
-                this.overlayTransitionables[0].set(1, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[0] = true;
-                    }.bind(this));
-            }
-        }.bind(this));
-        this.containerSurfaces[0].on('mouseleave', function() {
-            if(this.overlaySurfaceShowing[0]) {
-                this.overlayTransitionables[0].set(0, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[0] = false;
-                    }.bind(this));
-            }
-        }.bind(this));
-        //Panel 2
-        this.containerSurfaces[1].on('mouseenter', function() {
-            if(!this.overlaySurfaceShowing[1]) {
-                this.overlayTransitionables[1].set(1, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[1] = true;
-                    }.bind(this));
-            }
-        }.bind(this));
-        this.containerSurfaces[1].on('mouseleave', function() {
-            if(this.overlaySurfaceShowing[1]) {
-                this.overlayTransitionables[1].set(0, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[1] = false;
-                    }.bind(this));
-            }
-        }.bind(this));
-        //Panel 3
-        this.containerSurfaces[2].on('mouseenter', function() {
-            if(!this.overlaySurfaceShowing[2]) {
-                this.overlayTransitionables[2].set(1, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[2] = true;
-                    }.bind(this));
-            }
-        }.bind(this));
-        this.containerSurfaces[2].on('mouseleave', function() {
-            if(this.overlaySurfaceShowing[2]) {
-                this.overlayTransitionables[2].set(0, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[2] = false;
-                    }.bind(this));
-            }
-        }.bind(this));
-        //Panel 4
-        this.containerSurfaces[3].on('mouseenter', function() {
-            if(!this.overlaySurfaceShowing[3]) {
-                this.overlayTransitionables[3].set(1, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[3] = true;
-                    }.bind(this));
-            }
-        }.bind(this));
-        this.containerSurfaces[3].on('mouseleave', function() {
-            if(this.overlaySurfaceShowing[3]) {
-                this.overlayTransitionables[3].set(0, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[3] = false;
-                    }.bind(this));
-            }
-        }.bind(this));
-        //Panel 5
-        this.containerSurfaces[4].on('mouseenter', function() {
-            if(!this.overlaySurfaceShowing[4]) {
-                this.overlayTransitionables[4].set(1, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[4] = true;
-                    }.bind(this));
-            }
-        }.bind(this));
-        this.containerSurfaces[4].on('mouseleave', function() {
-            if(this.overlaySurfaceShowing[4]) {
-                this.overlayTransitionables[4].set(0, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[4] = false;
-                    }.bind(this));
-            }
-        }.bind(this));
-        //Panel 6
-        this.containerSurfaces[5].on('mouseenter', function() {
-            if(!this.overlaySurfaceShowing[5]) {
-                this.overlayTransitionables[5].set(1, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[5] = true;
-                    }.bind(this));
-            }
-        }.bind(this));
-        this.containerSurfaces[5].on('mouseleave', function() {
-            if(this.overlaySurfaceShowing[5]) {
-                this.overlayTransitionables[5].set(0, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[5] = false;
-                    }.bind(this));
-            }
-        }.bind(this));
-        //Panel 7
-        this.containerSurfaces[6].on('mouseenter', function() {
-            if(!this.overlaySurfaceShowing[6]) {
-                this.overlayTransitionables[6].set(1, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[6] = true;
-                    }.bind(this));
-            }
-        }.bind(this));
-        this.containerSurfaces[6].on('mouseleave', function() {
-            if(this.overlaySurfaceShowing[6]) {
-                this.overlayTransitionables[6].set(0, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[6] = false;
-                    }.bind(this));
-            }
-        }.bind(this));
-        //Panel 8
-        this.containerSurfaces[7].on('mouseenter', function() {
-            if(!this.overlaySurfaceShowing[7]) {
-                this.overlayTransitionables[7].set(1, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[7] = true;
-                    }.bind(this));
-            }
-        }.bind(this));
-        this.containerSurfaces[7].on('mouseleave', function() {
-            if(this.overlaySurfaceShowing[7]) {
-                this.overlayTransitionables[7].set(0, {duration: 0, curve: Easing.inOutQuart},
-                    function() {
-                        this.overlaySurfaceShowing[7] = false;
-                    }.bind(this));
-            }
-        }.bind(this));
-    }
     function _setListeners() {
-        this.containerSurfaces[0].on('click', function() {
-            this.profileView.show(); 
-        }.bind(this));
-        /*this.showEpisodesButtonContainer.on('click', function() {
-            if(!this.episodesViewShowing) {
-                this.showEpisodesButtonTransistionable.set(1);
-                this.episodesView.show();
-                this.episodesViewShowing = true;
-            } else {
-                this.episodesView.hide();
-                this.episodesViewShowing = false;
-
-            }
-        }.bind(this));*/ 
+        for(var i = 0; i < 8; i++) {
+            this.profileCardArray[i].containerSurface.on('click', function() {
+                this.profileView[i].show(); 
+            }.bind(this));
+        }   
     }
 
     ProfilesView.prototype.show = function () {

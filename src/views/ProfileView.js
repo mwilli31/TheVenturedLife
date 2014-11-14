@@ -15,9 +15,11 @@ define(function(require, exports, module) {
     var HeaderFooter    = require('famous/views/HeaderFooterLayout');
     var ScrollContainer = require('famous/views/ScrollContainer');
 
-    function ProfileView() {
+    function ProfileView(i) {
+        
         View.apply(this, arguments);
 
+        this.viewNumber = i;
         this.windowWidth = window.innerWidth;
         this.windowHeight = window.innerHeight;
 
@@ -94,7 +96,7 @@ define(function(require, exports, module) {
         var surfaces = [];
         for(var i = 0; i < 5; i++) {
             surfaces.push(new Surface({
-                content: "I am surface" + (i+1),
+                content: "I am surface" + (this.viewNumber+1),
                 properties: {
                     backgroundColor: 'white'
                 }
