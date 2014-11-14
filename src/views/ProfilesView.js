@@ -30,10 +30,10 @@ define(function(require, exports, module) {
         _createProfileView.call(this);
     }
     function _createProfileView() {
-        for(var i = 0; i < 8; i++) {
+        /*for(var i = 0; i < 8; i++) {
             this.profileArray.push(new ProfilesView(i));
             this.add(this.profileView[i]); 
-        }
+        }*/
     }
 
     ProfilesView.prototype = Object.create(View.prototype);
@@ -99,11 +99,11 @@ define(function(require, exports, module) {
         this.add(popupModifier).add(this.popupGrid);
     }
     function _setListeners() {
-        for(var i = 0; i < 8; i++) {
+        /*for(var i = 0; i < 8; i++) {
             this.profileCardArray[i].containerSurface.on('click', function() {
                 this.profileView[i].show(); 
             }.bind(this));
-        }   
+        }   */ 
     }
 
     ProfilesView.prototype.show = function () {
