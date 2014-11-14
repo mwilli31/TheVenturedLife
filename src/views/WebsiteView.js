@@ -181,7 +181,8 @@ define(function(require, exports, module) {
     function _createEpisodesView() {
        this.episodesView = new EpisodesView();
         this.add(this.episodesView);
-    } 
+    }
+
     //creates ProfilesView
     function _createProfilesView() {
         this.profilesView = new ProfilesView();
@@ -189,26 +190,18 @@ define(function(require, exports, module) {
     }
 
     function _setListeners() {
-        this.showEpisodesButtonContainer.on('mouseover', function() {
-            if(!this.episodesButtonHighlighted) {
+        this.showEpisodesButtonContainer.on('mouseenter', function() {
                 this.showEpisodesButtonTransistionable.set(1, {
-                    duration: 100,
+                    duration: 200,
                     curve: Easing.inOutQuart
-                }, function() {
-                    this.episodesButtonHighlighted = true;
-                }.bind(this));
-            }
+                });
         }.bind(this));
 
-        this.showEpisodesButtonContainer.on('mouseout', function() {
-            if(this.episodesButtonHighlighted && !this.episodesViewShowing) {
+        this.showEpisodesButtonContainer.on('mouseleave', function() {
                 this.showEpisodesButtonTransistionable.set(0, {
-                    duration: 100,
+                    duration: 200,
                     curve: Easing.inOutQuart
-                }, function () {
-                    this.episodesButtonHighlighted = false;
-                }.bind(this));
-            }
+                });
         }.bind(this));
 
         this.showEpisodesButtonContainer.on('click', function() {
@@ -219,7 +212,6 @@ define(function(require, exports, module) {
             } else {
                 this.episodesView.hide();
                 this.episodesViewShowing = false;
-
             }
         }.bind(this));
 
@@ -231,9 +223,7 @@ define(function(require, exports, module) {
                 this.showEpisodesButtonTransistionable.set(0, {
                     duration: 200,
                     curve: Easing.inOutQuart
-                }, function () {
-                    this.episodesButtonHighlighted = false;
-                }.bind(this));
+                });
             }
             if(this.profilesViewShowing) {
                 this.profilesView.hide();
@@ -242,33 +232,24 @@ define(function(require, exports, module) {
                 this.showProfilesButtonTransitionable.set(0, {
                     duration: 200,
                     curve: Easing.inOutQuart
-                }, function () {
-                    this.profilesButtonHighlighted = false;
-                }.bind(this));
+                });
             }
         }.bind(this));
 
-        this.showProfilesButtonConatiner.on('mouseover', function() {
-            if(!this.profilesButtonHighlighted) {
+        this.showProfilesButtonConatiner.on('mouseenter', function() {
                 this.showProfilesButtonTransitionable.set(1, {
-                    duration: 100,
+                    duration: 200,
                     curve: Easing.inOutQuart
-                }, function() {
-                    this.profilesButtonHighlighted = true;
-                }.bind(this));
-            }
+                });
         }.bind(this));
-        this.showProfilesButtonConatiner.on('mouseout', function() {
-            if(this.profilesButtonHighlighted && !this.profilesViewShowing) {
-                this.showProfilesButtonTransitionable.set(0, {
-                    duration: 100,
-                    curve: Easing.inOutQuart
-                }, function () {
-                    this.profilesButtonHighlighted = false;
-                }.bind(this));
-            }
 
+        this.showProfilesButtonConatiner.on('mouseleave', function() {
+                this.showProfilesButtonTransitionable.set(0, {
+                    duration: 200,
+                    curve: Easing.inOutQuart
+                });
         }.bind(this));
+
          this.showProfilesButtonConatiner.on('click', function() {
             if(!this.profilesViewShowing) {
                 this.showProfilesButtonTransitionable.set(1);
@@ -277,7 +258,6 @@ define(function(require, exports, module) {
             } else {
                 this.profilesView.hide();
                 this.profilesViewShowing = false;
-
             }
         }.bind(this));
 
