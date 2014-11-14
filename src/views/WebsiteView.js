@@ -57,12 +57,12 @@ define(function(require, exports, module) {
 
         this.showEpisodesButton = new ImageSurface({
             size: [undefined,undefined],
-            content: 'img/ViewEpisodesButton.png'
+            content: 'img/Buttons/ViewEpisodesButton.png'
         });
 
         this.showEpisodesButtonHighlighted = new ImageSurface({
             size: [undefined,undefined],
-            content: 'img/ViewEpisodesButtonPressed.png'
+            content: 'img/Buttons/ViewEpisodesButtonPressed.png'
         });
 
         var showEpisodesButtonModifier = new StateModifier({
@@ -94,12 +94,12 @@ define(function(require, exports, module) {
 
         this.showProfilesButton = new ImageSurface({
             size: [undefined, undefined],
-            content: 'img/ViewEpisodesButton.png'
+            content: 'img/Buttons/InnovativeVoicesButton.png'
         });
 
         this.showProfilesButtonHighlighted = new ImageSurface({
             size: [undefined, undefined],
-            content: 'img/ViewEpisodesButtonPressed.png'
+            content: 'img/Buttons/InnovativeVoicesPressed.png'
         });
 
         var showProfilesButtonModifier = new StateModifier({
